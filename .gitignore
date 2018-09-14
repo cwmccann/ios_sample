@@ -1,0 +1,139 @@
+######################
+# Project Specific
+######################
+
+######################
+# Node
+######################
+/node/**
+/node_tmp/**
+/node_modules/**
+
+######################
+# virtual machine crash logs, see http://www.java.com/en/download/help/error_hotspot.xml
+######################
+hs_err_pid*
+
+
+
+######################
+# Eclipse
+######################
+*.pydevproject
+.project
+.metadata
+/bin/**
+/tmp/**
+/tmp/**/*
+*.tmp
+*.bak
+*.swp
+*~.nib
+local.properties
+.classpath
+.settings/**
+.loadpath
+/src/main/resources/rebel.xml
+api-test-automation/.settings/org.eclipse.buildship.core.prefs
+/.dbeaver-data-sources.xml
+
+# External tool builders
+.externalToolBuilders/**
+
+# Locally stored "Eclipse launch configurations"
+*.launch
+
+# CDT-specific
+.cproject
+
+# PDT-specific
+.buildpath
+
+######################
+# Intellij
+######################
+.idea/**
+*.iml
+*.iws
+*.ipr
+*.ids
+*.orig
+
+######################
+# Maven
+######################
+/log/**
+/target/**
+
+######################
+# Gradle
+######################
+.gradle/**
+
+######################
+# Package Files
+######################
+*.jar
+*.war
+*.ear
+*.db
+
+######################
+# Windows
+######################
+# Windows image file caches
+Thumbs.db
+
+# Folder config file
+Desktop.ini
+
+######################
+# Mac OSX
+######################
+.DS_Store
+.svn
+
+# Thumbnails
+._*
+
+# Files that might appear on external disk
+.Spotlight-V100
+.Trashes
+sh.exe.stackdump
+
+######################
+# Directories
+######################
+/build/**
+/bin/**
+/out/**
+/spring_loaded/**
+/deploy/**
+/packages/**
+/server/packages/**
+
+######################
+# Logs
+######################
+*.log
+/appium/**
+
+######################
+# Others
+######################
+*.class
+*.*~
+*~
+.merge_file*
+
+######################
+# Gradle Wrapper
+######################
+!gradle/wrapper/gradle-wrapper.jar
+
+
+######################
+# ESLint
+######################
+.eslintcache
+

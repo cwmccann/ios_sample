@@ -22,13 +22,11 @@ public class AppiumService {
     private static final int ONE_MINUTE = 60 * ONE_SECOND;
 
     private int pid;
-    private String deviceSerial;
     private Integer port;
     private String logDirectory = "appium";
     private ProcessHandle processHandle;
 
-    public AppiumService(String deviceSerial, Integer port) {
-        this.deviceSerial = deviceSerial;
+    public AppiumService(Integer port) {
         this.port = port;
     }
 
@@ -42,7 +40,7 @@ public class AppiumService {
             String chromePort = String.valueOf(port + 3000); // set the bootstrap port to be in the 48xxx range
 
             // create the log dir if needed
-            File logsDir = new File(logDirectory + "/" + deviceSerial);
+            File logsDir = new File(logDirectory);
             log.info("Folder for logs {}", logsDir.getAbsolutePath());
             if (!logsDir.exists()) {
                 logsDir.mkdirs();
@@ -73,15 +71,15 @@ public class AppiumService {
             process = processBuilder.start();
             processHandle = process.toHandle();
 
-            log.debug("Device " + deviceSerial + ": Appium server started");
-            log.debug("Device " + deviceSerial + ": Appium server on port " + port + " for device " + deviceSerial);
+            log.debug("Appium server started");
+            log.debug("Appium server on port {}", port);
 
             if (PollingService.poll(this::pollAppiumServer, 2 * ONE_MINUTE, ONE_SECOND)) {
                 log.debug("Appium Server is running and ready to accept requests");
             }
 
         } catch (Exception ex) {
-            throw new Exception("Device " + deviceSerial + ": Failed to start Appium server", ex);
+            throw new Exception("Failed to start Appium server", ex);
         }
         return process;
     }
@@ -108,12 +106,12 @@ public class AppiumService {
      * Shutdown the Appium server. This needs to be done before exiting the application so we are not left with node.exe running.
      */
     public void stopAppium() {
-        log.info("Device " + deviceSerial + ": Stopping Appium server...");
+        log.info("Stopping Appium server...");
         if (processHandle == null) {
             log.error("Invalid processHandle for appium.  Did appium start?");
             return;
         }
-        log.debug("Device " + deviceSerial + ": Appium server stopping with PID " + processHandle.pid());
+        log.debug("Appium server stopping with PID " + processHandle.pid());
 
         if (!processHandle.isAlive()) {
             //if it's shutdown that is okay
@@ -141,7 +139,7 @@ public class AppiumService {
         if (!processHandle.isAlive()) {
             log.info("Appium server stopped");
         } else {
-            throw new RuntimeException("Device " + deviceSerial + ": Failed to stop Appium server");
+            throw new RuntimeException("Failed to stop Appium server");
         }
     }
 

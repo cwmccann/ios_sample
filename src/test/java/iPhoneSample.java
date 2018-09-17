@@ -2,6 +2,8 @@ import io.appium.java_client.ios.IOSDriver;
 import lombok.extern.slf4j.Slf4j;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.remote.DesiredCapabilities;
+import org.testng.annotations.AfterClass;
+import org.testng.annotations.BeforeClass;
 import org.testng.annotations.DataProvider;
 import org.testng.annotations.Test;
 import org.zeroturnaround.exec.ProcessExecutor;
@@ -18,6 +20,8 @@ import static org.testng.AssertJUnit.fail;
 
 @Slf4j
 public class iPhoneSample {
+    private final int appiumPort = 7500;
+    private final AppiumService appiumService = new AppiumService(appiumPort);
 
     /**
      * This method will provide data to any test method that declares that its Data Provider is named "phones".
@@ -26,31 +30,38 @@ public class iPhoneSample {
     @DataProvider(name = "phones", parallel = true)
     public Iterator<Object[]> createData() {
         log.info("createData called");
-        final AtomicInteger appiumPort = new AtomicInteger(7500);
         final AtomicInteger wdaLocalPort = new AtomicInteger(8100);
         final AtomicInteger webkitDebugProxyPort = new AtomicInteger(27335);
 
         List<Object[]> data = IosHelper.getConnectedDevices().stream()
-                .map(d -> new Object[] {d, appiumPort.getAndIncrement(), wdaLocalPort.getAndIncrement(), webkitDebugProxyPort.getAndIncrement()})
+                .map(d -> new Object[] {d, appiumPort, wdaLocalPort.getAndIncrement(), webkitDebugProxyPort.getAndIncrement()})
                 .collect(Collectors.toList());
 
         return data.iterator();
     }
 
+    @BeforeClass
+    public void startAppium() throws Exception {
+        log.debug("Starting test appium port {}", appiumPort);
+        appiumService.startAppium();
+    }
+
+    @AfterClass
+    public void stopAppium() {
+        appiumService.stopAppium();
+    }
+
+
+
     @Test(dataProvider = "phones")
     public void testWebDriver(IosHelper.IosDevice device, Integer appiumPort, Integer wdaLocalPort, Integer webkitDebugProxyPort) throws Exception {
-        log.debug("{} - Starting test appium port {}", device.getUuid(), appiumPort);
-
         log.debug("Killing all services related to {}", device.getUuid());
         ProcessResult result = new ProcessExecutor()
                 .command("pkill", "-f", device.getUuid())
                 .readOutput(true)
                 .execute();
 
-        AppiumService appiumService = new AppiumService(device.getUuid(), appiumPort);
         try {
-            appiumService.startAppium();
-
             DesiredCapabilities capabilities = new DesiredCapabilities();
             capabilities.setCapability("platformName", "iOS");
             capabilities.setCapability("deviceName", device.getName());
@@ -95,8 +106,6 @@ public class iPhoneSample {
         } catch (Exception e) {
             log.error(device.getUuid() + " - Failed: ", e);
             fail(device.getUuid() + " - Failed:");
-        } finally {
-            appiumService.stopAppium();
         }
         log.debug("{} - Finished test", device.getUuid());
     }

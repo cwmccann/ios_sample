@@ -4,6 +4,8 @@ import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.remote.DesiredCapabilities;
 import org.testng.annotations.DataProvider;
 import org.testng.annotations.Test;
+import org.zeroturnaround.exec.ProcessExecutor;
+import org.zeroturnaround.exec.ProcessResult;
 
 import java.net.URL;
 import java.util.Iterator;
@@ -11,17 +13,11 @@ import java.util.List;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
 
-import static org.testng.AssertJUnit.assertEquals;
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.testng.AssertJUnit.fail;
 
 @Slf4j
 public class iPhoneSample {
-
-    @Test
-    public void testGetDevices() {
-        IosHelper.getConnectedDevices()
-                .forEach(d -> log.debug("Found device: {}", d));
-    }
 
     /**
      * This method will provide data to any test method that declares that its Data Provider is named "phones".
@@ -42,8 +38,15 @@ public class iPhoneSample {
     }
 
     @Test(dataProvider = "phones")
-    public void testWebDriver(IosHelper.IosDevice device, Integer appiumPort, Integer wdaLocalPort, Integer webkitDebugProxyPort) {
+    public void testWebDriver(IosHelper.IosDevice device, Integer appiumPort, Integer wdaLocalPort, Integer webkitDebugProxyPort) throws Exception {
         log.debug("{} - Starting test appium port {}", device.getUuid(), appiumPort);
+
+        log.debug("Killing all services related to {}", device.getUuid());
+        ProcessResult result = new ProcessExecutor()
+                .command("pkill", "-f", device.getUuid())
+                .readOutput(true)
+                .execute();
+
         AppiumService appiumService = new AppiumService(device.getUuid(), appiumPort);
         try {
             appiumService.startAppium();
@@ -85,8 +88,8 @@ public class iPhoneSample {
             //Give it a bit of time to get there
             Thread.sleep(1000);
             log.debug("{} - Current URL: {}", device.getUuid(), driver.getCurrentUrl());
-            assertEquals("https://www.google.com/", driver.getCurrentUrl());
 
+            assertThat(driver.getCurrentUrl()).startsWith("https://www.google.com/");
             driver.quit();
 
         } catch (Exception e) {

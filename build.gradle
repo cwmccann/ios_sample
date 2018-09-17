@@ -22,6 +22,7 @@ dependencies {
 
     // Use TestNg test framework
     testImplementation group: 'org.testng', name: 'testng', version:'6.11'
+    testImplementation group: 'org.assertj', name:'assertj-core', version:'3.11.1'
 }
 
 test {

@@ -61,6 +61,8 @@ public class iPhoneSample {
                 .readOutput(true)
                 .execute();
 
+        String xcconfig = iPhoneSample.class.getClassLoader().getResource("miw.xcconfig").getFile();
+        log.debug("xcconfig: {}", xcconfig);
         try {
             DesiredCapabilities capabilities = new DesiredCapabilities();
             capabilities.setCapability("platformName", "iOS");
@@ -90,6 +92,10 @@ public class iPhoneSample {
 
             //id of the web driver agent bundle, set in xcode project
             capabilities.setCapability("updatedWDABundleId", "com.miw.WebDriverAgentRunner");
+
+            // This config file manages the code signing for WebDriverAgent
+            capabilities.setCapability("xcodeConfigFile", xcconfig);
+
 
             log.debug("{} - Going to open driver", device.getUuid());
             WebDriver driver = new IOSDriver<>(new URL("http://127.0.0.1:" + appiumPort + "/wd/hub"), capabilities);

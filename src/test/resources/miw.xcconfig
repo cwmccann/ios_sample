@@ -1,4 +1,2 @@
-{
-	"xcodeOrgId": "TJK2DM8785",
-	"xcodeSigningId": "iPhone Developer"
-}
+ DEVELOPMENT_TEAM = TJK2DM8785
+ CODE_SIGN_IDENTITY = iPhone Developer

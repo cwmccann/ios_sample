@@ -1,6 +1,7 @@
 import lombok.Data;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.StringUtils;
 import org.zeroturnaround.exec.ProcessExecutor;
 import org.zeroturnaround.exec.ProcessResult;
 
@@ -52,5 +53,9 @@ public class IosHelper {
         private String uuid;
         private String name;
         private String version;
+
+        public String getName() {
+            return StringUtils.isNotEmpty(name) ? name : "iPhone";
+        }
     }
 }

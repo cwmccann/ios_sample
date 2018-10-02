@@ -51,9 +51,49 @@ public class iPhoneSample {
         appiumService.stopAppium();
     }
 
-
-
     @Test(dataProvider = "phones")
+    public void testCustomWebDriver(IosHelper.IosDevice device, Integer appiumPort, Integer wdaLocalPort, Integer webkitDebugProxyPort) throws Exception {
+        log.debug("Killing all services related to {}", device.getUuid());
+        ProcessResult result = new ProcessExecutor()
+                .command("pkill", "-f", device.getUuid())
+                .readOutput(true)
+                .execute();
+
+        WdaServer wdaServer = new WdaServer(device.getUuid(), wdaLocalPort);
+        try {
+            wdaServer.start();
+
+            DesiredCapabilities capabilities = new DesiredCapabilities();
+            capabilities.setCapability("platformName", "iOS");
+            capabilities.setCapability("deviceName", device.getName());
+            capabilities.setCapability("platformVersion", "11.2.5");
+            capabilities.setCapability("udid", device.getUuid());
+            capabilities.setCapability("browserName", "Safari");
+            capabilities.setCapability("webkitDebugProxyPort", webkitDebugProxyPort);
+            capabilities.setCapability("webDriverAgentUrl", wdaServer.getServerUrl());
+
+            log.debug("{} - Going to open driver", device.getUuid());
+            WebDriver driver = new IOSDriver<>(new URL("http://127.0.0.1:" + appiumPort + "/wd/hub"), capabilities);
+
+            log.debug("{} - Open google", device.getUuid());
+            driver.get("http://www.google.com");
+            //Give it a bit of time to get there
+            Thread.sleep(1000);
+            log.debug("{} - Current URL: {}", device.getUuid(), driver.getCurrentUrl());
+
+            assertThat(driver.getCurrentUrl()).startsWith("https://www.google.com/");
+            driver.quit();
+
+        } catch (Exception e) {
+            log.error(device.getUuid() + " - Failed: ", e);
+            fail(device.getUuid() + " - Failed:");
+        } finally {
+            wdaServer.stop();
+        }
+        log.debug("{} - Finished test", device.getUuid());
+    }
+
+    //@Test(dataProvider = "phones")
     public void testWebDriver(IosHelper.IosDevice device, Integer appiumPort, Integer wdaLocalPort, Integer webkitDebugProxyPort) throws Exception {
         log.debug("Killing all services related to {}", device.getUuid());
         ProcessResult result = new ProcessExecutor()
@@ -64,13 +104,16 @@ public class iPhoneSample {
         String xcconfig = iPhoneSample.class.getClassLoader().getResource("miw.xcconfig").getFile();
         log.debug("xcconfig: {}", xcconfig);
         try {
+
             DesiredCapabilities capabilities = new DesiredCapabilities();
             capabilities.setCapability("platformName", "iOS");
             capabilities.setCapability("deviceName", device.getName());
             capabilities.setCapability("platformVersion", "11.2.5");
             capabilities.setCapability("udid", device.getUuid());
             capabilities.setCapability("browserName", "Safari");
-            capabilities.setCapability("xcodeOrgId", "TJK2DM8785");
+            capabilities.setCapability("webkitDebugProxyPort", webkitDebugProxyPort);
+
+            capabilities.setCapability("xcodeOrgId", "P9MSLF2266");
             capabilities.setCapability("xcodeSigningId", "iPhone Developer");
             capabilities.setCapability("automationName", "XCUITest");
 
@@ -96,7 +139,6 @@ public class iPhoneSample {
             // This config file manages the code signing for WebDriverAgent
             capabilities.setCapability("xcodeConfigFile", xcconfig);
 
-
             log.debug("{} - Going to open driver", device.getUuid());
             WebDriver driver = new IOSDriver<>(new URL("http://127.0.0.1:" + appiumPort + "/wd/hub"), capabilities);
 
@@ -115,6 +157,8 @@ public class iPhoneSample {
         }
         log.debug("{} - Finished test", device.getUuid());
     }
+
+
 
 
 }

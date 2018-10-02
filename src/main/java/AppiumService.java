@@ -18,9 +18,6 @@ import java.util.concurrent.TimeoutException;
 @Data
 @Slf4j
 public class AppiumService {
-    private static final int ONE_SECOND = 1000;
-    private static final int ONE_MINUTE = 60 * ONE_SECOND;
-
     private int pid;
     private Integer port;
     private String logDirectory = "appium";
@@ -74,7 +71,7 @@ public class AppiumService {
             log.debug("Appium server started");
             log.debug("Appium server on port {}", port);
 
-            if (PollingService.poll(this::pollAppiumServer, 2 * ONE_MINUTE, ONE_SECOND)) {
+            if (PollingService.poll(this::pollAppiumServer, 2 * Constants.ONE_MINUTE, Constants.ONE_SECOND)) {
                 log.debug("Appium Server is running and ready to accept requests");
             }
 

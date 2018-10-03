@@ -72,6 +72,10 @@ public class iPhoneSample {
             capabilities.setCapability("webkitDebugProxyPort", webkitDebugProxyPort);
             capabilities.setCapability("webDriverAgentUrl", wdaServer.getServerUrl());
 
+            //ios-webkit-debug-proxy http://appium.io/docs/en/writing-running-appium/web/ios-webkit-debug-proxy/
+            //NOTE: the proxy requires the "web inspector" to be turned on to allow a connection to be established. Turn it on by going to settings > safari > advanced.
+            capabilities.setCapability("startIWDP", true);
+
             log.debug("{} - Going to open driver", device.getUuid());
             WebDriver driver = new IOSDriver<>(new URL("http://127.0.0.1:" + appiumPort + "/wd/hub"), capabilities);
 
